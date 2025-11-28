@@ -4,30 +4,21 @@ import connectDB from "./config/db.js";
 import authRoutes from "./routes/auth.routes.js";
 import gameRoutes from "./routes/game.routes.js";
 
-connectDB(); // OK on Vercel
-
-
 const app = express();
 
-// Allow Vercel frontend
-app.use(
-  cors({
-    origin: [
-      "https://tic-tac-toe-tc59.vercel.app",   // your frontend domain
-      "http://localhost:5173",                // dev mode
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  })
-);
-
+// middleware
+app.use(cors());
 app.use(express.json());
 
+// connect DB
+connectDB();
+
+// routes
 app.use("/api/auth", authRoutes);
 app.use("/api/game", gameRoutes);
 
 app.get("/", (req, res) => {
-  res.send("Backend is running!");
+  res.send("Tic Tac Toe Server Running!");
 });
 
-export default app;   // <-- VERY IMPORTANT
+export default app;
