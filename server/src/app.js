@@ -6,7 +6,10 @@ import gameRoutes from "./routes/game.routes.js";
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || '*',
+  credentials: true
+}));
 app.use(express.json());
 
 connectDB();
@@ -15,7 +18,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/game", gameRoutes);
 
 app.get("/", (req, res) => {
-  res.send("Tic Tac Toe Server Running!");
+  res.json({ message: "Tic Tac Toe Server Running!" });
 });
 
 export default app;

@@ -1,0 +1,5 @@
+- [x] Fix server/api/index.js to export Express app directly for Vercel
+- [x] Update server/src/app.js to return JSON on root route and configure CORS
+- [x] Modify server/src/config/db.js to prevent multiple MongoDB connections
+- [x] Update server/vercel.json with CORS headers
+- [x] Verify all changes and provide final code
