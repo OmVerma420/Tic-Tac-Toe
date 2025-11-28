@@ -8,120 +8,93 @@ import ai4 from "../gameLogic/aiLevel4";
 import ai5 from "../gameLogic/aiLevel5";
 import { useNavigate } from "react-router-dom";
 
-const aiMap = {
-  1: ai1,
-  2: ai2,
-  3: ai3,
-  4: ai4,
-  5: ai5,
-};
+const aiMap = { 1: ai1, 2: ai2, 3: ai3, 4: ai4, 5: ai5 };
 
 export default function Game() {
   const [level, setLevel] = useState(1);
   const [board, setBoard] = useState(Array(9).fill(null));
   const [playerTurn, setPlayerTurn] = useState(true);
   const [results, setResults] = useState([]);
-  
-  const [levelFinished, setLevelFinished] = useState(false);  // 🔥 FIX
-
+  const [isLevelDone, setIsLevelDone] = useState(false);
   const nav = useNavigate();
 
+  // Reset board when level changes
   useEffect(() => {
-  const winner = checkWinner(board);
-  if (!winner) return;
+    setBoard(Array(9).fill(null));
+    setPlayerTurn(true);
+    setIsLevelDone(false);
+  }, [level]);
 
-  // Prevent duplicate results
-  // Check if this level is already recorded
-  const alreadySaved = results.some(r => r.level === level);
-  if (alreadySaved) return;
-
-  let result = "";
-  if (winner === "X") result = "win";
-  else if (winner === "O") result = "lose";
-  else result = "draw";
-
-  const updated = [...results, { level, result }];
-  setResults(updated);
-
-  setTimeout(() => {
-    if (level < 5) {
-      setLevel(level + 1);
-    } else {
-      nav("/result", { state: { results: updated } });
-    }
-  }, 500);
-}, [board]);
-
-
+  // Check winner after each move
   useEffect(() => {
-    if (levelFinished) return; // 🔥 prevent double results
-    
+    if (isLevelDone) return;
+
     const cur = checkWinner(board);
     if (!cur) return;
 
-    setLevelFinished(true);
+    setIsLevelDone(true);
 
-    let result;
-    if (cur === "X") result = "win";
-    else if (cur === "O") result = "lose";
-    else result = "draw";
+    let result =
+      cur === "X" ? "win" : cur === "O" ? "lose" : "draw";
 
-    const finalList = [...results, { level, result }];
-    setResults(finalList);
+    setResults(prev => {
+      const updated = [...prev, { level, result }];
 
-    setTimeout(() => {
-      if (level < 5) {
-        setLevel(level + 1);
-      } else {
-        nav("/result", { state: { results: finalList } });
-      }
-    }, 700);
+      setTimeout(() => {
+        if (level < 5) {
+          setLevel(level + 1);
+        } else {
+          nav("/result", { state: { results: updated } });
+        }
+      }, 600);
 
+      return updated;
+    });
   }, [board]);
 
-  const handlePlayerMove = (idx) => {
-    if (!playerTurn || board[idx] || levelFinished) return;
+  // AI turn handler (runs only when it's AI's turn)
+  useEffect(() => {
+    if (isLevelDone) return;
+    if (playerTurn) return; // wait for player's move
 
-    const newBoard = [...board];
-    newBoard[idx] = "X";
-    setBoard(newBoard);
-    setPlayerTurn(false);
+    const aiFn = aiMap[level];
 
     setTimeout(() => {
-      const aiFn = aiMap[level];
-      const aiMove = aiFn(newBoard, "O", "X");
-
-      if (aiMove != null) {
-        const b2 = [...newBoard];
-        b2[aiMove] = "O";
-        setBoard(b2);
+      const move = aiFn(board, "O", "X");
+      if (move != null) {
+        setBoard(prev => {
+          const b = [...prev];
+          b[move] = "O";
+          return b;
+        });
       }
-
       setPlayerTurn(true);
-    }, 250);
+    }, 300);
+  }, [playerTurn, level, board, isLevelDone]);
+
+  const handlePlayerMove = (idx) => {
+    if (!playerTurn || board[idx] || isLevelDone) return;
+
+    setBoard(prev => {
+      const b = [...prev];
+      b[idx] = "X";
+      return b;
+    });
+
+    setPlayerTurn(false);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black flex flex-col items-center p-6 text-white">
-      
-      <div className="text-center mb-6">
-        <h2 className="text-4xl font-bold">Level {level}</h2>
-        <p className="text-gray-300 text-lg">Difficulty: {level}</p>
-      </div>
+    <div className="min-h-screen bg-gray-900 flex flex-col items-center text-white p-6">
+      <h2 className="text-4xl font-bold mb-4">Level {level}</h2>
 
-      <div className="p-5 rounded-2xl bg-white/10 border-white/10">
+      <div className="p-5 bg-white/10 rounded-xl shadow-xl">
         <Board board={board} onCellClick={handlePlayerMove} />
       </div>
 
-      <h3 className="mt-6 text-gray-300">Results so far:</h3>
-      <p className="text-sm text-purple-300 mt-1">
-        {results.map(r => (
-          <span key={r.level} className="mr-2 px-2 py-1 rounded-full bg-purple-900/40">
-            L{r.level}: {r.result}
-          </span>
-        ))}
+      <p className="text-purple-300 mt-4">
+        Results so far: {JSON.stringify(results)}
       </p>
-
     </div>
   );
 }

@@ -1,4 +1,3 @@
-// returns "X" or "O" if winner, "draw" if full, or null if game continues
 export default function checkWinner(board) {
   const lines = [
     [0,1,2],[3,4,5],[6,7,8],
@@ -8,10 +7,14 @@ export default function checkWinner(board) {
 
   for (const [a,b,c] of lines) {
     if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-      return board[a];
+      return board[a]; // "X" or "O"
     }
   }
 
-  if (board.every(Boolean)) return "draw";
-  return null;
+  // only draw if:
+  // - all filled
+  // - AND no winner above
+  const isFull = board.every(v => v !== null);
+
+  return isFull ? "draw" : null;
 }
