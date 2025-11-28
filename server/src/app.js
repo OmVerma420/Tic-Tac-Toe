@@ -6,14 +6,11 @@ import gameRoutes from "./routes/game.routes.js";
 
 const app = express();
 
-// middleware
 app.use(cors());
 app.use(express.json());
 
-// connect DB
 connectDB();
 
-// routes
 app.use("/api/auth", authRoutes);
 app.use("/api/game", gameRoutes);
 

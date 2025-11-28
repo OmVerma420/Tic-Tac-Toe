@@ -1,6 +1,4 @@
 {
-  "name": "tic-tac-toe-backend",
-  "version": "1.0.0",
   "type": "module",
   "dependencies": {
     "express": "^4.19.2",
@@ -10,7 +8,4 @@
     "jsonwebtoken": "^9.0.2",
     "cors": "^2.8.5"
   }
-
 }
-
-
