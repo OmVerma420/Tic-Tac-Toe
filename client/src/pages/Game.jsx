@@ -27,10 +27,31 @@ export default function Game() {
   const nav = useNavigate();
 
   useEffect(() => {
-    setBoard(Array(9).fill(null));
-    setPlayerTurn(true);
-    setLevelFinished(false);   // reset for next level
-  }, [level]);
+  const winner = checkWinner(board);
+  if (!winner) return;
+
+  // Prevent duplicate results
+  // Check if this level is already recorded
+  const alreadySaved = results.some(r => r.level === level);
+  if (alreadySaved) return;
+
+  let result = "";
+  if (winner === "X") result = "win";
+  else if (winner === "O") result = "lose";
+  else result = "draw";
+
+  const updated = [...results, { level, result }];
+  setResults(updated);
+
+  setTimeout(() => {
+    if (level < 5) {
+      setLevel(level + 1);
+    } else {
+      nav("/result", { state: { results: updated } });
+    }
+  }, 500);
+}, [board]);
+
 
   useEffect(() => {
     if (levelFinished) return; // 🔥 prevent double results
