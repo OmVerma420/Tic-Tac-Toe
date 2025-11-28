@@ -1,0 +1,5 @@
+/* simple reset and minimal styling */
+html,body,#root { height: 100%; margin: 0; font-family: Inter, Roboto, Arial, sans-serif; }
+button { cursor: pointer; padding: 8px 12px; border-radius: 6px; border: 1px solid #ccc; background: #f8f8f8; }
+input { padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%; box-sizing: border-box; }
+.app { max-width: 880px; margin: 20px auto; }
