@@ -30,26 +30,31 @@ export default function Game() {
   }, [level]);
 
   useEffect(() => {
-    const cur = checkWinner(board);
-    if (!cur) return;
+  const cur = checkWinner(board);
+  if (!cur) return;
 
-    // finalize match
-    let result;
-    if (cur === "X") result = "win";
-    else if (cur === "O") result = "lose";
-    else result = "draw";
+  let result;
+  if (cur === "X") result = "win";
+  else if (cur === "O") result = "lose";
+  else result = "draw";
 
-    setResults(prev => [...prev, { level, result }]);
+  // compute the next results array immediately (NO stale state)
+  const updatedResults = [...results, { level, result }];
 
-    // small delay then move to next level or results
-    const t = setTimeout(() => {
-      if (level < 5) setLevel(level + 1);
-      else nav("/result", { state: { results: [...results, { level, result }] } });
-    }, 800);
+  setResults(updatedResults);
 
-    return () => clearTimeout(t);
-    // eslint-disable-next-line
-  }, [board]);
+  const t = setTimeout(() => {
+    if (level < 5) {
+      setLevel(level + 1);
+    } else {
+      // USE updatedResults (NOT old results)
+      nav("/result", { state: { results: updatedResults } });
+    }
+  }, 800);
+
+  return () => clearTimeout(t);
+}, [board]);
+
 
   const handlePlayerMove = (idx) => {
     if (!playerTurn || board[idx]) return;
