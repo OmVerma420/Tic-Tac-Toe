@@ -6,9 +6,21 @@ import gameRoutes from "./routes/game.routes.js";
 
 connectDB(); // OK on Vercel
 
+
 const app = express();
 
-app.use(cors());
+// Allow Vercel frontend
+app.use(
+  cors({
+    origin: [
+      "https://tic-tac-toe-tc59.vercel.app",   // your frontend domain
+      "http://localhost:5173",                // dev mode
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
